@@ -10,6 +10,7 @@ import MyAlertDialog from "@/components/custom-things/my-alert";
 export default function Home() {
   const [value, setValue] = useState(""); //text area value
   const [scShow, setscShow] = useState(false); // share code triggering thing
+  const [errorMsg, setErrorMsg] = useState(""); // error message field
 
   // setTimeout(()=>setscShow(true),2000) // SIMULATE FORM SUBMIT!
 
@@ -21,15 +22,32 @@ export default function Home() {
     const extra = Math.floor(value.length / 60);
     return Math.max(3, lines + extra);
   };
+  async function handleSubmit(e){
+    e.preventDefault();
+    setErrorMsg(""); // clear previous error
+    // SEND POST REQUEST TO API
+     
+      const res = await fetch('/api/share-text', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: value })
+      });
+
+      if(!res.ok){
+        
+      }
+     
+   
+
+  }
 
 
 
 
 
   return (
-
     <div className="min-h-screen flex items-center justify-center pb-40 sm:pb-0">
-      {/* this alert shows the sharing code */}
+      {/* this alert shows the sharing code, that will be passed as props */}
       <MyAlertDialog isOpen={scShow} />
       <div className="w-full !max-w-lg flex flex-col gap-4 p-4  rounded-xl shadow-lg sm:max-w-sm xs:max-w-full xs:p-2 xs:mx-4 ">
         <div className="mb-4">
@@ -38,7 +56,10 @@ export default function Home() {
             Share text between your devices instantly and securely.
           </p>
         </div>
-        <form className="flex flex-col gap-4">
+        {errorMsg && (
+          <div className="text-red-600 text-center text-sm mb-2">{errorMsg}</div>
+        )}
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Textarea
             required
             placeholder="Type your message here."
@@ -49,12 +70,9 @@ export default function Home() {
           />
           <Button type="submit">Send message</Button>
         </form>
-
-
         <Button asChild variant="secondary">
           <Link href="/retrieve">Retrieve via share code</Link>
         </Button>
-
       </div>
     </div>
   );
