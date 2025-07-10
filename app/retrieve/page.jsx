@@ -12,6 +12,7 @@ export default function RetrievePage() {
   const [retrievedText, setRetrievedText] = useState("");
   const [copied, setCopied] = useState(false);
   const [errMsg, setErrMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
 
 
@@ -24,36 +25,25 @@ export default function RetrievePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try{
-    const res= await fetch(`/api/retrieve-text?code=${encodeURIComponent(shareCode)}`,{
-      method:'GET',
-    });
-    if(!res.ok){
-      setErrMsg("Invalid or expired sharing code!")
-      return;
+      const res= await fetch(`/api/retrieve-text?code=${encodeURIComponent(shareCode)}`,{
+        method:'GET',
+      });
+      if(!res.ok){
+        setErrMsg("Invalid or expired sharing code!")
+        return;
+      }
+      const {text}=await res.json();  // DEBUGGING: console.log(text);
+      setRetrievedText(text);
+      setShowResult(true);
     }
-
-
-
-    const {text}=await res.json();  // DEBUGGING: console.log(text);
-    
-    setRetrievedText(text);
-    setShowResult(true);
-
-
-   
-  }
-  catch(err){
-    console.error("ERROR LOGS:",err)
-    setErrMsg("Server Down! Please try again Later")
-  }
-
-
-
-
-    
-    
-    
+    catch(err){
+      console.error("ERROR LOGS:",err)
+      setErrMsg("Server Down! Please try again Later")
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleBack = () => {
@@ -85,7 +75,19 @@ export default function RetrievePage() {
                 placeholder="e.g. 0cb2"
                 className="w-full"
               />
-              <Button type="submit" className="w-full">Retrieve</Button>
+              <Button type="submit" className="w-full flex items-center justify-center" disabled={loading}>
+                {loading ? (
+                  <>
+                    <svg className="animate-spin mr-2 h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
+                    Please wait...
+                  </>
+                ) : (
+                  "Retrieve"
+                )}
+              </Button>
               <Link href="/">
                 <Button type="button" variant="secondary" className="w-full cursor-pointer">Share text</Button>
               </Link>

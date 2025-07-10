@@ -12,6 +12,7 @@ export default function Home() {
   const [scShow, setscShow] = useState(false); // share code triggering thing
   const [scode,setSCode] = useState(null) // SHARING CODE!
   const [errorMsg, setErrorMsg] = useState(""); // error message field
+  const [loading, setLoading] = useState(false); // loading state
 
 
   // setTimeout(()=>setscShow(true),2000) // SIMULATE FORM SUBMIT!
@@ -27,34 +28,28 @@ export default function Home() {
   async function handleSubmit(e){
     e.preventDefault();
     setErrorMsg(""); // clear previous error
-    // SEND POST REQUEST TO API
-     try{
+    setLoading(true);
+    try{
       const res = await fetch('/api/share-text', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: value })
       });
-
       if(!res.ok){ // if response is NOT OK
         throw new Error("error"); // this throws an error, catch will catch it
       }
-
       // AS RES IS OK SO PROCEED:
-
       const {CODE}= await res.json();
       setSCode(CODE); // sets Sharing code to code received from backend
       setscShow(true); // shows the popup for 5 seconds!
-
     }
     catch(err){
       console.error("Error logs:",err)
       setErrorMsg("Server Down! Please try again later");
       return;
-
+    } finally {
+      setLoading(false);
     }
-     
-   
-
   }
 
 
@@ -84,7 +79,19 @@ export default function Home() {
             rows={getRows()}
             className="min-h-[120px] max-h-[200px] sm:max-h-[250px] rounded-lg w-full"
           />
-          <Button type="submit">Send message</Button>
+          <Button type="submit" disabled={loading} className="flex items-center justify-center">
+            {loading ? (
+              <>
+                <svg className="animate-spin mr-2 h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
+                Please wait...
+              </>
+            ) : (
+              "Send message"
+            )}
+          </Button>
         </form>
         <Button asChild variant="secondary">
           <Link href="/retrieve">Retrieve via share code</Link>
