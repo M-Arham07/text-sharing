@@ -62,7 +62,7 @@ export default function Home() {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center pb-40 sm:pb-0">
+    <div className="min-h-screen flex items-center justify-center pb-50 sm:pb-0">
       {/* this alert shows the sharing code, that will be passed as props */}
       <MyAlertDialog isOpen={scShow} code={scode}/>
       <div className="w-full !max-w-lg flex flex-col gap-4 p-4  rounded-xl shadow-lg sm:max-w-sm xs:max-w-full xs:p-2 xs:mx-4 ">
