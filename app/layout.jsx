@@ -42,6 +42,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="google-site-verification" content="7pyngYjfoRH8ND5ayllD2r3ZQFWY42axqNDOsEfa1FI" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}>
         <div className="flex-1 flex flex-col">
           {children}
