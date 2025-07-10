@@ -1,21 +1,59 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
+import { set } from "mongoose";
 
 export default function RetrievePage() {
   const [shareCode, setShareCode] = useState("");
   const [showResult, setShowResult] = useState(false);
   const [retrievedText, setRetrievedText] = useState("");
   const [copied, setCopied] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
 
-  const handleSubmit = (e) => {
+
+
+  // share code changes (user starts typing), remove error msg
+  useEffect(()=>{
+    setErrMsg("")
+
+  },[shareCode]);
+
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulate retrieval
-    setRetrievedText("This is the retrieved shared text.");
+    try{
+    const res= await fetch(`/api/retrieve-text?code=${encodeURIComponent(shareCode)}`,{
+      method:'GET',
+    });
+    if(!res.ok){
+      setErrMsg("Invalid or expired sharing code!")
+      return;
+    }
+
+
+
+    const {text}=await res.json();  // DEBUGGING: console.log(text);
+    
+    setRetrievedText(text);
     setShowResult(true);
+
+
+   
+  }
+  catch(err){
+    console.error("ERROR LOGS:",err)
+    setErrMsg("Server Down! Please try again Later")
+  }
+
+
+
+
+    
+    
+    
   };
 
   const handleBack = () => {
@@ -33,6 +71,9 @@ export default function RetrievePage() {
             <p className="text-center text-muted-foreground text-base max-w-xs mx-auto mb-2">
               Enter your share code below to retrieve your shared text.
             </p>
+            {errMsg && (
+              <div className="text-red-600 text-center text-sm mb-2">{errMsg}</div>
+            )}
             <form className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
               <label htmlFor="share-code" className="text-sm font-medium text-foreground">Enter share code</label>
               <Input

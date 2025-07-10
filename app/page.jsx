@@ -10,7 +10,9 @@ import MyAlertDialog from "@/components/custom-things/my-alert";
 export default function Home() {
   const [value, setValue] = useState(""); //text area value
   const [scShow, setscShow] = useState(false); // share code triggering thing
+  const [scode,setSCode] = useState(null) // SHARING CODE!
   const [errorMsg, setErrorMsg] = useState(""); // error message field
+
 
   // setTimeout(()=>setscShow(true),2000) // SIMULATE FORM SUBMIT!
 
@@ -26,16 +28,30 @@ export default function Home() {
     e.preventDefault();
     setErrorMsg(""); // clear previous error
     // SEND POST REQUEST TO API
-     
+     try{
       const res = await fetch('/api/share-text', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: value })
       });
 
-      if(!res.ok){
-        
+      if(!res.ok){ // if response is NOT OK
+        throw new Error("error"); // this throws an error, catch will catch it
       }
+
+      // AS RES IS OK SO PROCEED:
+
+      const {CODE}= await res.json();
+      setSCode(CODE); // sets Sharing code to code received from backend
+      setscShow(true); // shows the popup for 5 seconds!
+
+    }
+    catch(err){
+      console.error("Error logs:",err)
+      setErrorMsg("Server Down! Please try again later");
+      return;
+
+    }
      
    
 
@@ -48,7 +64,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex items-center justify-center pb-40 sm:pb-0">
       {/* this alert shows the sharing code, that will be passed as props */}
-      <MyAlertDialog isOpen={scShow} />
+      <MyAlertDialog isOpen={scShow} code={scode}/>
       <div className="w-full !max-w-lg flex flex-col gap-4 p-4  rounded-xl shadow-lg sm:max-w-sm xs:max-w-full xs:p-2 xs:mx-4 ">
         <div className="mb-4">
           <h1 className="text-3xl font-extrabold text-center tracking-tight text-primary mb-2">Text Shared</h1>

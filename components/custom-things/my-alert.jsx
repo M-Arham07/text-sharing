@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react";
 
-export default function MyAlertDialog({ isOpen, code = "A1B2-C3D4" }) {
+export default function MyAlertDialog({ isOpen, code}) {
   const [okEnabled, setOkEnabled] = useState(false);
   const [open, setOpen] = useState(isOpen);
 
@@ -44,7 +44,7 @@ export default function MyAlertDialog({ isOpen, code = "A1B2-C3D4" }) {
               >
                 {code}
               </span>
-              <span className="text-base font-medium text-center text-muted-foreground">Copy this code to share text between your devices. You can't see this again!</span>
+              <span className="text-base font-medium text-center text-muted-foreground">Copy this code to share text between your devices. You can't see this again! This code is only valid for 10 minutes.</span>
             </span>
           </AlertDialogDescription> 
         </AlertDialogHeader>
